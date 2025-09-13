@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Control de Transporte - Corralejo-Lobos</title>
+
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#0077be"/>
+
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Transporte Lobos">
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<header>
+  <h1>Control de Transporte Marítimo</h1>
+  <p>Corralejo ↔️ Isla de Lobos</p>
+</header>
+
+<div class="container">
+  <div class="tabs">
+    <div class="tab active" data-tab="registro">Nuevo Registro</div>
+    <div class="tab" data-tab="historial">Historial</div>
+    <div class="tab" data-tab="estadisticas">Estadísticas</div>
+    <div class="tab" data-tab="configuracion">Configuración</div>
+  </div>
+
+  <div class="tab-content active" id="registro">
+    <div class="card">
+      <h2>Registrar Nuevo Viaje</h2>
+      <form id="viaje-form">
+        <div class="form-group">
+          <label for="fecha">Fecha</label>
+          <input type="date" id="fecha" required />
+        </div>
+        <div class="form-group">
+          <label for="barco">Barco</label>
+          <select id="barco" required>
+            <option value="">Seleccionar barco</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="hora-salida">Hora de salida</label>
+          <input type="time" id="hora-salida" required />
+        </div>
+        <div class="form-group">
+          <label for="hora-llegada">Hora de llegada</label>
+          <input type="time" id="hora-llegada" required />
+        </div>
+        <div class="form-group">
+          <label for="direccion">Dirección del viaje</label>
+          <select id="direccion" required>
+            <option value="">Seleccionar dirección</option>
+            <option value="Corralejo → Lobos">Corralejo → Lobos</option>
+            <option value="Lobos → Corralejo">Lobos → Corralejo</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="agua-potable">Agua potable (litros)</label>
+          <input type="number" id="agua-potable" min="0" value="0" />
+        </div>
+        <div class="form-group">
+          <label for="agua-residual">Agua residual (litros)</label>
+          <input type="number" id="agua-residual" min="0" value="0" />
+        </div>
+        <div class="form-group">
+          <label for="bolsas-basura">Bolsas de basura</label>
+          <input type="number" id="bolsas-basura" min="0" value="0" />
+        </div>
+        <div class="form-group">
+          <label for="combustible">Combustible utilizado (litros)</label>
+          <input type="number" id="combustible" min="0" step="0.1" required />
+          <div class="auto-calc-label">
+            <input type="checkbox" id="auto-calcular" checked />
+            <label for="auto-calcular">Calcular automáticamente según consumo del barco</label>
+          </div>
+          <div class="combustible-info" id="combustible-info">El combustible se calculará automáticamente al ingresar las horas</div>
+        </div>
+        <div class="form-group">
+          <label for="observaciones">Observaciones</label>
+          <textarea id="observaciones" rows="3"></textarea>
+        </div>
+        <div class="btn-group">
+          <button type="submit">Guardar Registro</button>
+          <button type="reset" class="secondary" id="btn-reset">Limpiar Formulario</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="tab-content" id="historial">
+    <div class="card">
+      <h2>Historial de Viajes</h2>
+      <div class="date-selector">
+        <label for="filtro-fecha">Filtrar por fecha:</label>
+        <input type="date" id="filtro-fecha" />
+        <button id="limpiar-filtro" class="accent" type="button">Limpiar filtro</button>
+      </div>
+      <div class="tabla-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Barco</th>
+              <th>Dirección</th>
+              <th>Agua (L)</th>
+              <th>Residual (L)</th>
+              <th>Bolsas</th>
+              <th>Combustible</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="historial-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-content" id="estadisticas">
+    <div class="card">
+      <h2>Estadísticas del Día</h2>
+      <div class="date-selector">
+        <label for="estadistica-fecha">Seleccionar fecha:</label>
+        <input type="date" id="estadistica-fecha" />
+      </div>
+      <div class="stats">
+        <div class="stat-card"><div class="stat-value" id="total-agua">0</div><div class="stat-label">Litros de agua potable</div></div>
+        <div class="stat-card"><div class="stat-value" id="total-residual">0</div><div class="stat-label">Litros de agua residual</div></div>
+        <div class="stat-card"><div class="stat-value" id="total-bolsas">0</div><div class="stat-label">Bolsas de basura</div></div>
+        <div class="stat-card"><div class="stat-value" id="total-combustible">0</div><div class="stat-label">Litros de combustible</div></div>
+      </div>
+      <h3>Resumen por barco</h3>
+      <div class="tabla-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Barco</th>
+              <th>Viajes</th>
+              <th>Agua (L)</th>
+              <th>Residual (L)</th>
+              <th>Bolsas</th>
+              <th>Combustible (L)</th>
+            </tr>
+          </thead>
+          <tbody id="estadisticas-body"></tbody>
+        </table>
+      </div>
+      <div class="resumen-mensual">
+        <h2>Resumen Mensual</h2>
+        <div class="filtro-mes">
+          <label for="filtro-mes">Seleccionar mes:</label>
+          <select id="filtro-mes"><option value="">Todos los meses</option></select>
+          <select id="filtro-ano"><option value="">Todos los años</option></select>
+        </div>
+        <div class="stats">
+          <div class="stat-card"><div class="stat-value" id="mensual-agua">0</div><div class="stat-label">Agua potable mensual (L)</div></div>
+          <div class="stat-card"><div class="stat-value" id="mensual-residual">0</div><div class="stat-label">Agua residual mensual (L)</div></div>
+          <div class="stat-card"><div class="stat-value" id="mensual-bolsas">0</div><div class="stat-label">Bolsas mensuales</div></div>
+          <div class="stat-card"><div class="stat-value" id="mensual-combustible">0</div><div class="stat-label">Combustible mensual (L)</div></div>
+        </div>
+        <h3>Totales por día</h3>
+        <div class="tabla-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Agua Potable (L)</th>
+                <th>Agua Residual (L)</th>
+                <th>Bolsas</th>
+                <th>Combustible (L)</th>
+              </tr>
+            </thead>
+            <tbody id="totales-diarios-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-content" id="configuracion">
+    <div class="card">
+      <h2>Gestión de Barcos</h2>
+      <form id="barco-form">
+        <div class="form-group">
+          <label for="nombre-barco">Nombre del barco</label>
+          <input type="text" id="nombre-barco" required />
+        </div>
+        <div class="form-group">
+          <label for="consumo-hora">Consumo de combustible (litros por hora)</label>
+          <input type="number" id="consumo-hora" min="0" step="0.1" required />
+        </div>
+        <button type="submit">Agregar Barco</button>
+      </form>
+      <div class="config-barcos">
+        <h3>Barcos Registrados</h3>
+        <div id="lista-barcos"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>Sistema de Control de Transporte Marítimo © 2025</p>
+</footer>
+
+<script src="app.js" defer></script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js');
+    });
+  }
+</script>
+</body>
+</html>
