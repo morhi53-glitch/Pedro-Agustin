@@ -1,0 +1,1468 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Control de Transporte Marítimo</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --dark-color: #34495e;
+            --light-color: #ecf0f1;
+            --ocean-color: #3498db;
+            --sand-color: #f1c40f;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+            color: #333;
+            min-height: 100vh;
+            padding-bottom: 70px;
+            -webkit-text-size-adjust: 100%;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        header {
+            background-color: rgba(255, 255, 255, 0.9);
+            color: var(--dark-color);
+            padding: 15px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .logo {
+            margin-right: 10px;
+            font-size: 24px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 15px;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        h1, h2, h3 {
+            margin-bottom: 15px;
+            color: var(--dark-color);
+        }
+        
+        form {
+            display: grid;
+            grid-gap: 15px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-gap: 15px;
+        }
+        
+        .form-group {
+            margin-bottom: 10px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: var(--dark-color);
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            -webkit-appearance: none;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+        
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        button i {
+            margin-right: 8px;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .btn-danger {
+            background-color: var(--danger-color);
+        }
+        
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+        
+        .btn-success {
+            background-color: var(--secondary-color);
+        }
+        
+        .btn-success:hover {
+            background-color: #27ae60;
+        }
+        
+        .btn-warning {
+            background-color: var(--warning-color);
+        }
+        
+        .btn-warning:hover {
+            background-color: #e67e22;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        th, td {
+            padding: 14px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            color: var(--dark-color);
+        }
+        
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .tab {
+            padding: 15px 20px;
+            cursor: pointer;
+            background: #f8f9fa;
+            text-align: center;
+            flex: 1;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .tab.active {
+            background: white;
+            border-bottom: 3px solid var(--primary-color);
+            font-weight: bold;
+        }
+        
+        .tab i {
+            margin-right: 8px;
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            grid-gap: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .summary-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            transition: transform 0.3s;
+        }
+        
+        .summary-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .summary-card h3 {
+            font-size: 16px;
+            margin-bottom: 12px;
+            color: var(--dark-color);
+        }
+        
+        .summary-card p {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin: 0;
+        }
+        
+        .summary-card .card-icon {
+            font-size: 32px;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+        
+        .action-btn {
+            cursor: pointer;
+            padding: 12px;
+            border-radius: 6px;
+            margin: 0 2px;
+            display: inline-block;
+            -webkit-tap-highlight-color: transparent;
+            border: none;
+            background: transparent;
+            min-width: 44px;
+            min-height: 44px;
+            font-size: 16px;
+        }
+        
+        .delete-btn {
+            color: var(--danger-color);
+            background: rgba(231, 76, 60, 0.1);
+        }
+        
+        .delete-btn:hover, .delete-btn:active {
+            background: rgba(231, 76, 60, 0.2);
+        }
+        
+        .period-selector {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .period-selector select {
+            flex: 1;
+        }
+        
+        .calculation-display {
+            background: #e8f4fc;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            background: var(--secondary-color);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+            transform: translateX(100%);
+            transition: transform 0.3s;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.error {
+            background: var(--danger-color);
+        }
+        
+        .backup-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        .backup-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        @media (max-width: 768px) {
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .period-selector {
+                flex-direction: column;
+            }
+            
+            .backup-buttons {
+                grid-template-columns: 1fr;
+            }
+            
+            table {
+                font-size: 14px;
+            }
+            
+            th, td {
+                padding: 12px 8px;
+            }
+            
+            .action-btn {
+                padding: 10px;
+                margin: 4px 0;
+                display: block;
+                text-align: center;
+                min-width: 44px;
+                min-height: 44px;
+            }
+        }
+        
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--dark-color);
+            color: white;
+            padding: 12px;
+            text-align: center;
+            font-size: 14px;
+        }
+        
+        .island-background {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 100px;
+            background: var(--sand-color);
+            z-index: -1;
+            opacity: 0.3;
+            border-top-left-radius: 50% 30%;
+            border-top-right-radius: 50% 30%;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            color: #7f8c8d;
+        }
+        
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            color: #bdc3c7;
+        }
+        
+        /* Mejoras para iOS */
+        .ios-clickable {
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        /* Asegurar que los botones sean más fáciles de tocar en iOS */
+        @media (max-width: 768px) {
+            button, .action-btn {
+                min-height: 44px;
+                min-width: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            /* Mejora específica para Safari iOS */
+            input, select, textarea {
+                font-size: 16px; /* Evita el zoom automático en iOS */
+            }
+        }
+        
+        /* Estilo para el input file en iOS */
+        .file-input-container {
+            position: relative;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .file-input-container input[type="file"] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        
+        .file-input-button {
+            display: block;
+            padding: 12px 20px;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="island-background"></div>
+    <div id="notification" class="notification"></div>
+    
+    <header>
+        <div class="logo"><i class="fas fa-ship"></i></div>
+        <h1>Control de Transporte Marítimo</h1>
+    </header>
+
+    <div class="container">
+        <div class="tabs">
+            <div class="tab active" data-tab="registro">
+                <i class="fas fa-plus-circle"></i> Nuevo Registro
+            </div>
+            <div class="tab" data-tab="viajes">
+                <i class="fas fa-history"></i> Historial
+            </div>
+            <div class="tab" data-tab="barcos">
+                <i class="fas fa-ship"></i> Barcos
+            </div>
+            <div class="tab" data-tab="resumen">
+                <i class="fas fa-chart-bar"></i> Resumen
+            </div>
+            <div class="tab" data-tab="backup">
+                <i class="fas fa-database"></i> Copia de Seguridad
+            </div>
+        </div>
+
+        <div class="tab-content active" id="registro">
+            <div class="card">
+                <h2><i class="fas fa-plus-circle"></i> Registrar Nuevo Viaje</h2>
+                <form id="viaje-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="fecha">Fecha:</label>
+                            <input type="date" id="fecha" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="barco">Barco:</label>
+                            <select id="barco" required>
+                                <option value="">Seleccionar barco</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="hora-salida">Hora de Salida:</label>
+                            <input type="time" id="hora-salida" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="hora-llegada">Hora de Llegada:</label>
+                            <input type="time" id="hora-llegada" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="agua-potable">Agua Potable (litros):</label>
+                            <input type="number" id="agua-potable" min="0" placeholder="Litros de Corralejo a Lobos">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="agua-residual">Agua Residual (litros):</label>
+                            <input type="number" id="agua-residual" min="0" placeholder="Litros de Lobos a Corralejo">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="bolsas-basura">Bolsas de Basura:</label>
+                            <input type="number" id="bolsas-basura" min="0" placeholder="Número de bolsas">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Combustible Calculado:</label>
+                            <div class="calculation-display" id="combustible-calculado">
+                                0.0 litros
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="submit"><i class="fas fa-save"></i> Registrar Viaje</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="tab-content" id="viajes">
+            <div class="card">
+                <h2><i class="fas fa-history"></i> Historial de Viajes</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <input type="text" id="filtro-fecha" placeholder="Filtrar por fecha (YYYY-MM-DD)">
+                    </div>
+                    <div class="form-group">
+                        <select id="filtro-barco">
+                            <option value="">Todos los barcos</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table id="tabla-viajes">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Barco</th>
+                                <th>Horas</th>
+                                <th>Agua Potable (L)</th>
+                                <th>Agua Residual (L)</th>
+                                <th>Bolsas</th>
+                                <th>Combustible (L)</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Los viajes se cargarán aquí dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+                <div id="empty-viajes" class="empty-state" style="display: none;">
+                    <i class="fas fa-ship"></i>
+                    <h3>No hay viajes registrados</h3>
+                    <p>Comienza agregando un nuevo viaje en la pestaña "Nuevo Registro"</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="barcos">
+            <div class="card">
+                <h2><i class="fas fa-ship"></i> Gestión de Barcos</h2>
+                <form id="barco-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="nombre-barco">Nombre del Barco:</label>
+                            <input type="text" id="nombre-barco" required placeholder="Ej. María del Mar">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="consumo-hora">Consumo de Combustible (L/hora):</label>
+                            <input type="number" id="consumo-hora" min="0" step="0.1" required placeholder="Ej. 12.5">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-success"><i class="fas fa-plus"></i> Agregar Barco</button>
+                </form>
+                
+                <h3 style="margin-top: 20px;">Barcos Registrados</h3>
+                <div style="overflow-x: auto;">
+                    <table id="tabla-barcos">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Consumo (L/h)</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Los barcos se cargarán aquí dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+                <div id="empty-barcos" class="empty-state" style="display: none;">
+                    <i class="fas fa-plus-circle"></i>
+                    <h3>No hay barcos registrados</h3>
+                    <p>Comienza agregando un nuevo barco usando el formulario superior</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="resumen">
+            <div class="card">
+                <h2><i class="fas fa-chart-bar"></i> Resumen</h2>
+                
+                <div class="period-selector">
+                    <select id="periodo-tipo">
+                        <option value="diario">Resumen Diario</option>
+                        <option value="mensual">Resumen Mensual</option>
+                        <option value="anual">Resumen Anual</option>
+                    </select>
+                    
+                    <input type="month" id="periodo-mes" style="display: none;">
+                    <input type="number" id="periodo-ano" style="display: none;" min="2000" max="2100" step="1" placeholder="Año">
+                    <input type="date" id="periodo-dia">
+                </div>
+                
+                <div class="summary-cards">
+                    <div class="summary-card">
+                        <div class="card-icon"><i class="fas fa-tint"></i></div>
+                        <h3>Total Agua Potable</h3>
+                        <p id="total-agua-potable">0 L</p>
+                    </div>
+                    <div class="summary-card">
+                        <div class="card-icon"><i class="fas fa-water"></i></div>
+                        <h3>Total Agua Residual</h3>
+                        <p id="total-agua-residual">0 L</p>
+                    </div>
+                    <div class="summary-card">
+                        <div class="card-icon"><i class="fas fa-trash"></i></div>
+                        <h3>Total Bolsas Basura</h3>
+                        <p id="total-bolsas">0</p>
+                    </div>
+                    <div class="summary-card">
+                        <div class="card-icon"><i class="fas fa-gas-pump"></i></div>
+                        <h3>Total Combustible</h3>
+                        <p id="total-combustible">0 L</p>
+                    </div>
+                </div>
+                
+                <h3>Detalles</h3>
+                <div style="overflow-x: auto;">
+                    <table id="tabla-resumen">
+                        <thead>
+                            <tr>
+                                <th>Barco</th>
+                                <th>Viajes</th>
+                                <th>Horas Trabajo</th>
+                                <th>Agua Potable (L)</th>
+                                <th>Agua Residual (L)</th>
+                                <th>Bolsas</th>
+                                <th>Combustible (L)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Los datos del resumen se cargarán aquí dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+                <div id="empty-resumen" class="empty-state" style="display: none;">
+                    <i class="fas fa-chart-bar"></i>
+                    <h3>No hay datos para mostrar</h3>
+                    <p>Selecciona otro período o agrega nuevos viajes</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="backup">
+            <div class="card">
+                <h2><i class="fas fa-database"></i> Copia de Seguridad</h2>
+                
+                <div class="backup-section">
+                    <h3>Exportar Datos</h3>
+                    <p>Exporta todos tus datos (barcos y viajes) a un archivo JSON para hacer una copia de seguridad o transferirlos a otro dispositivo.</p>
+                    <div class="backup-buttons">
+                        <button class="btn-success" id="btn-exportar">
+                            <i class="fas fa-download"></i> Exportar Datos
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="backup-section">
+                    <h3>Importar Datos</h3>
+                    <p>Importa datos desde un archivo JSON previamente exportado. ¡Atención! Esto reemplazará todos los datos actuales.</p>
+                    <div class="file-input-container">
+                        <div class="file-input-button">
+                            <i class="fas fa-upload"></i> Seleccionar archivo JSON
+                        </div>
+                        <input type="file" id="archivo-importar" accept=".json">
+                    </div>
+                    <div class="backup-buttons">
+                        <button class="btn-warning" id="btn-importar">
+                            <i class="fas fa-upload"></i> Importar Datos
+                        </button>
+                    </div>
+                </div>
+
+                <div class="backup-section">
+                    <h3>Gestión de Datos</h3>
+                    <p>Otras opciones para gestionar tus datos.</p>
+                    <div class="backup-buttons">
+                        <button class="btn-danger" id="btn-limpiar">
+                            <i class="fas fa-trash"></i> Eliminar Todos los Datos
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Control de Transporte Marítimo © 2023 | Corralejo - Isla de Lobos</p>
+    </div>
+
+    <script>
+        // Variables globales
+        let currentNotificationTimeout = null;
+        
+        // Detectar si es un dispositivo iOS
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        
+        // Funciones de utilidad
+        function showNotification(message, isError = false) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = 'notification';
+            
+            if (isError) {
+                notification.classList.add('error');
+            }
+            
+            notification.classList.add('show');
+            
+            // Limpiar timeout anterior si existe
+            if (currentNotificationTimeout) {
+                clearTimeout(currentNotificationTimeout);
+            }
+            
+            // Ocultar notificación después de 3 segundos
+            currentNotificationTimeout = setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        function generarId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+        }
+        
+        function calcularHorasTrabajo(horaSalida, horaLlegada) {
+            // Convertir horas a minutos desde 00:00
+            const [hSalida, mSalida] = horaSalida.split(':').map(Number);
+            const [hLlegada, mLlegada] = horaLlegada.split(':').map(Number);
+            
+            const minutosSalida = hSalida * 60 + mSalida;
+            let minutosLlegada = hLlegada * 60 + mLlegada;
+            
+            // Si la llegada es anterior a la salida, asumimos que es del día siguiente
+            if (minutosLlegada < minutosSalida) {
+                minutosLlegada += 24 * 60;
+            }
+            
+            const diferenciaMinutos = minutosLlegada - minutosSalida;
+            return diferenciaMinutos / 60; // Convertir a horas
+        }
+        
+        function obtenerBarcoPorId(id) {
+            const barcos = JSON.parse(localStorage.getItem('barcos')) || [];
+            return barcos.find(b => b.id === id) || { nombre: 'Desconocido', consumoHora: 0 };
+        }
+        
+        function formatearFecha(fechaStr) {
+            const fecha = new Date(fechaStr);
+            return fecha.toLocaleDateString('es-ES');
+        }
+        
+        // Funciones de gestión de datos
+        function initApp() {
+            // Inicializar almacenamiento si no existe
+            if (!localStorage.getItem('barcos')) {
+                // Datos de ejemplo
+                const barcosEjemplo = [
+                    { id: generarId(), nombre: "María del Mar", consumoHora: 12.5 },
+                    { id: generarId(), nombre: "Oceanía", consumoHora: 15.0 },
+                    { id: generarId(), nombre: "Lobos Express", consumoHora: 10.0 }
+                ];
+                localStorage.setItem('barcos', JSON.stringify(barcosEjemplo));
+            }
+            
+            if (!localStorage.getItem('viajes')) {
+                localStorage.setItem('viajes', JSON.stringify([]));
+            }
+        }
+        
+        function cambiarTab(tabName) {
+            // Desactivar todas las tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Activar la tab seleccionada
+            document.querySelector(`.tab[data-tab="${tabName}"]`).classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+            
+            // Recargar datos según la tab
+            if (tabName === 'viajes') {
+                cargarViajes();
+            } else if (tabName === 'barcos') {
+                cargarListaBarcos();
+            } else if (tabName === 'resumen') {
+                cargarResumen();
+            }
+        }
+        
+        function cargarBarcos() {
+            const selectBarco = document.getElementById('barco');
+            const selectFiltroBarco = document.getElementById('filtro-barco');
+            
+            selectBarco.innerHTML = '<option value="">Seleccionar barco</option>';
+            selectFiltroBarco.innerHTML = '<option value="">Todos los barcos</option>';
+            
+            const barcos = JSON.parse(localStorage.getItem('barcos')) || [];
+            
+            barcos.forEach(barco => {
+                const option = document.createElement('option');
+                option.value = barco.id;
+                option.textContent = `${barco.nombre} (${barco.consumoHora} L/h)`;
+                selectBarco.appendChild(option);
+                
+                const optionFiltro = option.cloneNode(true);
+                selectFiltroBarco.appendChild(optionFiltro);
+            });
+        }
+        
+        function cargarListaBarcos() {
+            const tablaBarcos = document.getElementById('tabla-barcos').querySelector('tbody');
+            const emptyState = document.getElementById('empty-barcos');
+            tablaBarcos.innerHTML = '';
+            
+            const barcos = JSON.parse(localStorage.getItem('barcos')) || [];
+            
+            if (barcos.length === 0) {
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            
+            barcos.forEach(barco => {
+                const tr = document.createElement('tr');
+                
+                tr.innerHTML = `
+                    <td>${barco.nombre}</td>
+                    <td>${barco.consumoHora} L/h</td>
+                    <td>
+                        <button class="action-btn delete-btn ios-clickable" data-id="${barco.id}" data-type="barco">
+                            <i class="fas fa-trash"></i> Eliminar
+                        </button>
+                    </td>
+                `;
+                
+                tablaBarcos.appendChild(tr);
+            });
+            
+            // Añadir event listeners para iOS
+            añadirEventListenersParaEliminacion();
+        }
+        
+        function cargarViajes() {
+            const tablaViajes = document.getElementById('tabla-viajes').querySelector('tbody');
+            const emptyState = document.getElementById('empty-viajes');
+            tablaViajes.innerHTML = '';
+            
+            const viajes = JSON.parse(localStorage.getItem('viajes')) || [];
+            const filtroFecha = document.getElementById('filtro-fecha').value;
+            const filtroBarco = document.getElementById('filtro-barco').value;
+            
+            // Ordenar viajes por fecha (más recientes primero)
+            viajes.sort((a, b) => new Date(b.fecha + 'T' + b.horaSalida) - new Date(a.fecha + 'T' + a.horaSalida));
+            
+            let viajesFiltrados = viajes;
+            
+            if (filtroFecha) {
+                viajesFiltrados = viajesFiltrados.filter(viaje => viaje.fecha === filtroFecha);
+            }
+            
+            if (filtroBarco) {
+                viajesFiltrados = viajesFiltrados.filter(viaje => viaje.barcoId === filtroBarco);
+            }
+            
+            if (viajesFiltrados.length === 0) {
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            
+            viajesFiltrados.forEach(viaje => {
+                const horasTrabajo = calcularHorasTrabajo(viaje.horaSalida, viaje.horaLlegada);
+                const barco = obtenerBarcoPorId(viaje.barcoId);
+                const combustible = horasTrabajo * barco.consumoHora;
+                
+                const tr = document.createElement('tr');
+                
+                tr.innerHTML = `
+                    <td>${formatearFecha(viaje.fecha)}</td>
+                    <td>${barco.nombre}</td>
+                    <td>${horasTrabajo.toFixed(1)} h</td>
+                    <td>${viaje.aguaPotable || 0}</td>
+                    <td>${viaje.aguaResidual || 0}</td>
+                    <td>${viaje.bolsasBasura || 0}</td>
+                    <td>${combustible.toFixed(1)}</td>
+                    <td>
+                        <button class="action-btn delete-btn ios-clickable" data-id="${viaje.id}" data-type="viaje">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                
+                tablaViajes.appendChild(tr);
+            });
+            
+            // Añadir event listeners para iOS
+            añadirEventListenersParaEliminacion();
+        }
+        
+        function filtrarViajes() {
+            cargarViajes();
+        }
+        
+        function cambiarTipoResumen() {
+            const tipo = document.getElementById('periodo-tipo').value;
+            
+            document.getElementById('periodo-dia').style.display = 'none';
+            document.getElementById('periodo-mes').style.display = 'none';
+            document.getElementById('periodo-ano').style.display = 'none';
+            
+            if (tipo === 'diario') {
+                document.getElementById('periodo-dia').style.display = 'block';
+            } else if (tipo === 'mensual') {
+                document.getElementById('periodo-mes').style.display = 'block';
+                // Establecer el mes actual por defecto
+                const ahora = new Date();
+                const mes = ahora.getFullYear() + '-' + String(ahora.getMonth() + 1).padStart(2, '0');
+                document.getElementById('periodo-mes').value = mes;
+            } else if (tipo === 'anual') {
+                document.getElementById('periodo-ano').style.display = 'block';
+                // Establecer el año actual por defecto
+                document.getElementById('periodo-ano').value = new Date().getFullYear();
+            }
+            
+            cargarResumen();
+        }
+        
+        function cargarResumen() {
+            const tipo = document.getElementById('periodo-tipo').value;
+            let periodoValue;
+            
+            if (tipo === 'diario') {
+                periodoValue = document.getElementById('periodo-dia').value;
+            } else if (tipo === 'mensual') {
+                periodoValue = document.getElementById('periodo-mes').value;
+            } else if (tipo === 'anual') {
+                periodoValue = document.getElementById('periodo-ano').value;
+            }
+            
+            const viajes = JSON.parse(localStorage.getItem('viajes')) || [];
+            const barcos = JSON.parse(localStorage.getItem('barcos')) || [];
+            const emptyState = document.getElementById('empty-resumen');
+            
+            // Inicializar datos de resumen
+            let totalAguaPotable = 0;
+            let totalAguaResidual = 0;
+            let totalBolsas = 0;
+            let totalCombustible = 0;
+            
+            // Inicializar datos por barco
+            const datosPorBarco = {};
+            barcos.forEach(barco => {
+                datosPorBarco[barco.id] = {
+                    nombre: barco.nombre,
+                    viajes: 0,
+                    horas: 0,
+                    aguaPotable: 0,
+                    aguaResidual: 0,
+                    bolsas: 0,
+                    combustible: 0
+                };
+            });
+            
+            // Procesar viajes
+            viajes.forEach(viaje => {
+                let incluirViaje = false;
+                
+                if (tipo === 'diario' && viaje.fecha === periodoValue) {
+                    incluirViaje = true;
+                } else if (tipo === 'mensual' && viaje.fecha.startsWith(periodoValue)) {
+                    incluirViaje = true;
+                } else if (tipo === 'anual' && viaje.fecha.startsWith(periodoValue)) {
+                    incluirViaje = true;
+                }
+                
+                if (incluirViaje) {
+                    const horasTrabajo = calcularHorasTrabajo(viaje.horaSalida, viaje.horaLlegada);
+                    const barco = obtenerBarcoPorId(viaje.barcoId);
+                    const combustible = horasTrabajo * barco.consumoHora;
+                    
+                    // Actualizar totales
+                    totalAguaPotable += parseInt(viaje.aguaPotable) || 0;
+                    totalAguaResidual += parseInt(viaje.aguaResidual) || 0;
+                    totalBolsas += parseInt(viaje.bolsasBasura) || 0;
+                    totalCombustible += combustible;
+                    
+                    // Actualizar datos por barco
+                    if (datosPorBarco[viaje.barcoId]) {
+                        datosPorBarco[viaje.barcoId].viajes += 1;
+                        datosPorBarco[viaje.barcoId].horas += horasTrabajo;
+                        datosPorBarco[viaje.barcoId].aguaPotable += parseInt(viaje.aguaPotable) || 0;
+                        datosPorBarco[viaje.barcoId].aguaResidual += parseInt(viaje.aguaResidual) || 0;
+                        datosPorBarco[viaje.barcoId].bolsas += parseInt(viaje.bolsasBasura) || 0;
+                        datosPorBarco[viaje.barcoId].combustible += combustible;
+                    }
+                }
+            });
+            
+            // Actualizar totales en la UI
+            document.getElementById('total-agua-potable').textContent = `${totalAguaPotable} L`;
+            document.getElementById('total-agua-residual').textContent = `${totalAguaResidual} L`;
+            document.getElementById('total-bolsas').textContent = totalBolsas;
+            document.getElementById('total-combustible').textContent = `${totalCombustible.toFixed(1)} L`;
+            
+            // Actualizar tabla de resumen
+            const tablaResumen = document.getElementById('tabla-resumen').querySelector('tbody');
+            tablaResumen.innerHTML = '';
+            
+            let hayDatos = false;
+            
+            for (const barcoId in datosPorBarco) {
+                const datos = datosPorBarco[barcoId];
+                
+                if (datos.viajes > 0) {
+                    hayDatos = true;
+                    const tr = document.createElement('tr');
+                    
+                    tr.innerHTML = `
+                        <td>${datos.nombre}</td>
+                        <td>${datos.viajes}</td>
+                        <td>${datos.horas.toFixed(1)} h</td>
+                        <td>${datos.aguaPotable}</td>
+                        <td>${datos.aguaResidual}</td>
+                        <td>${datos.bolsas}</td>
+                        <td>${datos.combustible.toFixed(1)} L</td>
+                    `;
+                    
+                    tablaResumen.appendChild(tr);
+                }
+            }
+            
+            if (hayDatos) {
+                emptyState.style.display = 'none';
+            } else {
+                emptyState.style.display = 'block';
+            }
+        }
+        
+        function agregarViaje(e) {
+            e.preventDefault();
+            
+            const fecha = document.getElementById('fecha').value;
+            const barcoId = document.getElementById('barco').value;
+            const horaSalida = document.getElementById('hora-salida').value;
+            const horaLlegada = document.getElementById('hora-llegada').value;
+            const aguaPotable = document.getElementById('agua-potable').value;
+            const aguaResidual = document.getElementById('agua-residual').value;
+            const bolsasBasura = document.getElementById('bolsas-basura').value;
+            
+            if (!barcoId) {
+                showNotification('Por favor, selecciona un barco', true);
+                return;
+            }
+            
+            if (!horaSalida || !horaLlegada) {
+                showNotification('Por favor, completa las horas de salida y llegada', true);
+                return;
+            }
+            
+            const viajes = JSON.parse(localStorage.getItem('viajes')) || [];
+            const nuevoId = generarId();
+            
+            const nuevoViaje = {
+                id: nuevoId,
+                fecha,
+                barcoId,
+                horaSalida,
+                horaLlegada,
+                aguaPotable: aguaPotable || 0,
+                aguaResidual: aguaResidual || 0,
+                bolsasBasura: bolsasBasura || 0
+            };
+            
+            viajes.push(nuevoViaje);
+            localStorage.setItem('viajes', JSON.stringify(viajes));
+            
+            showNotification('Viaje registrado correctamente');
+            document.getElementById('viaje-form').reset();
+            document.getElementById('fecha').value = new Date().toISOString().split('T')[0];
+            document.getElementById('combustible-calculado').textContent = '0.0 litros';
+            
+            // Recargar datos
+            cargarViajes();
+            cargarResumen();
+        }
+        
+        function agregarBarco(e) {
+            e.preventDefault();
+            
+            const nombre = document.getElementById('nombre-barco').value.trim();
+            const consumoHora = parseFloat(document.getElementById('consumo-hora').value);
+            
+            if (!nombre) {
+                showNotification('Por favor, ingresa un nombre para el barco', true);
+                return;
+            }
+            
+            if (!consumoHora || consumoHora <= 0) {
+                showNotification('Por favor, ingresa un consumo de combustible válido', true);
+                return;
+            }
+            
+            const barcos = JSON.parse(localStorage.getItem('barcos')) || [];
+            const nuevoId = generarId();
+            
+            const nuevoBarco = {
+                id: nuevoId,
+                nombre,
+                consumoHora
+            };
+            
+            barcos.push(nuevoBarco);
+            localStorage.setItem('barcos', JSON.stringify(barcos));
+            
+            showNotification('Barco agregado correctamente');
+            document.getElementById('barco-form').reset();
+            
+            // Recargar datos
+            cargarBarcos();
+            cargarListaBarcos();
+        }
+        
+        function calcularCombustible() {
+            const barcoId = document.getElementById('barco').value;
+            const horaSalida = document.getElementById('hora-salida').value;
+            const horaLlegada = document.getElementById('hora-llegada').value;
+            
+            if (!barcoId || !horaSalida || !horaLlegada) {
+                document.getElementById('combustible-calculado').textContent = '0.0 litros';
+                return;
+            }
+            
+            const horasTrabajo = calcularHorasTrabajo(horaSalida, horaLlegada);
+            const barco = obtenerBarcoPorId(barcoId);
+            const combustible = horasTrabajo * barco.consumoHora;
+            
+            document.getElementById('combustible-calculado').textContent = `${combustible.toFixed(1)} litros`;
+        }
+        
+        function eliminarViaje(id) {
+            if (!confirm('¿Estás seguro de que deseas eliminar este viaje?')) {
+                return;
+            }
+            
+            const viajes = JSON.parse(localStorage.getItem('viajes')) || [];
+            const viajesActualizados = viajes.filter(viaje => viaje.id !== id);
+            
+            localStorage.setItem('viajes', JSON.stringify(viajesActualizados));
+            
+            showNotification('Viaje eliminado correctamente');
+            
+            // Recargar datos
+            cargarViajes();
+            cargarResumen();
+        }
+        
+        function eliminarBarco(id) {
+            // Verificar si el barco tiene viajes asociados
+            const viajes = JSON.parse(localStorage.getItem('viajes')) || [];
+            const viajesConBarco = viajes.filter(viaje => viaje.barcoId === id);
+            
+            if (viajesConBarco.length > 0) {
+                showNotification('No se puede eliminar este barco porque tiene viajes registrados', true);
+                return;
+            }
+            
+            if (!confirm('¿Estás seguro de que deseas eliminar este barco?')) {
+                return;
+            }
+            
+            const barcos = JSON.parse(localStorage.getItem('barcos')) || [];
+            const barcosActualizados = barcos.filter(barco => barco.id !== id);
+            
+            localStorage.setItem('barcos', JSON.stringify(barcosActualizados));
+            
+            showNotification('Barco eliminado correctamente');
+            
+            // Recargar datos
+            cargarBarcos();
+            cargarListaBarcos();
+        }
+        
+        // Funciones de importación/exportación
+        function exportarDatos() {
+            const datos = {
+                barcos: JSON.parse(localStorage.getItem('barcos') || '[]'),
+                viajes: JSON.parse(localStorage.getItem('viajes') || '[]'),
+                exportado: new Date().toISOString()
+            };
+            
+            const datosStr = JSON.stringify(datos, null, 2);
+            const blob = new Blob([datosStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `backup-transporte-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            
+            // Limpiar
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 100);
+            
+            showNotification('Datos exportados correctamente');
+        }
+        
+        function importarDatos() {
+            const input = document.getElementById('archivo-importar');
+            const file = input.files[0];
+            
+            if (!file) {
+                showNotification('Por favor, selecciona un archivo', true);
+                return;
+            }
+            
+            if (!confirm('¿Estás seguro de que deseas importar estos datos? Se reemplazarán todos los datos actuales.')) {
+                return;
+            }
+            
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                try {
+                    const datos = JSON.parse(e.target.result);
+                    
+                    // Validar datos
+                    if (!datos.barcos || !datos.viajes) {
+                        throw new Error('Formato de archivo incorrecto');
+                    }
+                    
+                    // Guardar datos
+                    localStorage.setItem('barcos', JSON.stringify(datos.barcos));
+                    localStorage.setItem('viajes', JSON.stringify(datos.viajes));
+                    
+                    showNotification('Datos importados correctamente');
+                    
+                    // Recargar la aplicación
+                    cargarBarcos();
+                    cargarViajes();
+                    cargarListaBarcos();
+                    cargarResumen();
+                    
+                    // Limpiar input
+                    input.value = '';
+                    
+                } catch (error) {
+                    showNotification('Error al importar datos: ' + error.message, true);
+                }
+            };
+            
+            reader.readAsText(file);
+        }
+        
+        function limpiarDatos() {
+            if (!confirm('¿Estás seguro de que deseas eliminar TODOS los datos? Esta acción no se puede deshacer.')) {
+                return;
+            }
+            
+            localStorage.removeItem('barcos');
+            localStorage.removeItem('viajes');
+            
+            // Reiniciar con datos de ejemplo
+            initApp();
+            
+            showNotification('Todos los datos han sido eliminados');
+            
+            // Recargar la aplicación
+            cargarBarcos();
+            cargarViajes();
+            cargarListaBarcos();
+            cargarResumen();
+        }
+        
+        // Función para manejar eventos táctiles en iOS
+        function añadirEventListenersParaEliminacion() {
+            // Usar event delegation para manejar los clics en los botones de eliminar
+            document.addEventListener('click', function(e) {
+                // Comprobar si el clic fue en un botón de eliminar
+                const deleteButton = e.target.closest('.delete-btn');
+                if (deleteButton) {
+                    e.preventDefault();
+                    const id = deleteButton.getAttribute('data-id');
+                    const type = deleteButton.getAttribute('data-type');
+                    
+                    if (type === 'viaje') {
+                        eliminarViaje(id);
+                    } else if (type === 'barco') {
+                        eliminarBarco(id);
+                    }
+                }
+            });
+            
+            // Para dispositivos táctiles, añadir también eventos touchstart
+            if (isIOS) {
+                document.addEventListener('touchstart', function(e) {
+                    const deleteButton = e.target.closest('.delete-btn');
+                    if (deleteButton) {
+                        e.preventDefault();
+                        // Añadir una clase para feedback visual
+                        deleteButton.classList.add('active');
+                    }
+                });
+                
+                document.addEventListener('touchend', function(e) {
+                    const deleteButton = e.target.closest('.delete-btn');
+                    if (deleteButton) {
+                        deleteButton.classList.remove('active');
+                    }
+                });
+            }
+        }
+        
+        // Inicialización cuando el DOM está listo
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inicializar la aplicación
+            initApp();
+            
+            // Configurar tabs
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabName = tab.getAttribute('data-tab');
+                    cambiarTab(tabName);
+                });
+                
+                // Para dispositivos táctiles, añadir también eventos touchstart
+                if (isIOS) {
+                    tab.addEventListener('touchstart', function(e) {
+                        e.preventDefault();
+                        this.click();
+                    });
+                }
+            });
+            
+            // Establecer fecha actual por defecto
+            const hoy = new Date().toISOString().split('T')[0];
+            document.getElementById('fecha').value = hoy;
+            document.getElementById('periodo-dia').value = hoy;
+            
+            // Cargar barcos en el select
+            cargarBarcos();
+            
+            // Cargar historial de viajes
+            cargarViajes();
+            
+            // Cargar lista de barcos
+            cargarListaBarcos();
+            
+            // Cargar resumen del día
+            cargarResumen();
+            
+            // Event listeners para los formularios
+            document.getElementById('viaje-form').addEventListener('submit', agregarViaje);
+            document.getElementById('barco-form').addEventListener('submit', agregarBarco);
+            document.getElementById('filtro-fecha').addEventListener('input', filtrarViajes);
+            document.getElementById('filtro-barco').addEventListener('change', filtrarViajes);
+            
+            // Event listeners para el cálculo de combustible
+            document.getElementById('barco').addEventListener('change', calcularCombustible);
+            document.getElementById('hora-salida').addEventListener('change', calcularCombustible);
+            document.getElementById('hora-llegada').addEventListener('change', calcularCombustible);
+            
+            // Event listeners para el resumen
+            document.getElementById('periodo-tipo').addEventListener('change', cambiarTipoResumen);
+            document.getElementById('periodo-dia').addEventListener('change', cargarResumen);
+            document.getElementById('periodo-mes').addEventListener('change', cargarResumen);
+            document.getElementById('periodo-ano').addEventListener('change', cargarResumen);
+            
+            // Event listeners para backup
+            document.getElementById('btn-exportar').addEventListener('click', exportarDatos);
+            document.getElementById('btn-importar').addEventListener('click', importarDatos);
+            document.getElementById('btn-limpiar').addEventListener('click', limpiarDatos);
+            
+            // Para iOS, añadir event listeners específicos para el input file
+            if (isIOS) {
+                const fileInput = document.getElementById('archivo-importar');
+                const fileInputButton = document.querySelector('.file-input-button');
+                
+                fileInputButton.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    fileInput.click();
+                });
+            }
+            
+            // Inicializar tipo de resumen
+            cambiarTipoResumen();
+            
+            // Añadir event listeners para eliminación
+            añadirEventListenersParaEliminacion();
+        });
+    </script>
+</body>
+</html>
