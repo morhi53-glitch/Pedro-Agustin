@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transporte Isla de Lobos</title>
+    <meta name="description" content="Sistema de gestión de transporte para Isla de Lobos">
+    <meta name="theme-color" content="#2c3e50">
+    <link rel="manifest" href="app.webmanifest">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚢</text></svg>">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #3498db;
+            --secondary: #2c3e50;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #34495e;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            color: white;
+            padding: 1rem;
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .app-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .app-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+        
+        .btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        .btn-warning {
+            background-color: var(--warning);
+            color: white;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        .card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .card-title {
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            color: var(--secondary);
+            border-bottom: 2px solid var(--light);
+            padding-bottom: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        .transport-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .transport-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            transition: transform 0.3s ease;
+        }
+        
+        .transport-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .transport-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--secondary);
+            margin-bottom: 10px;
+        }
+        
+        .transport-detail {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .transport-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            color: var(--dark);
+            transition: color 0.3s ease;
+        }
+        
+        .action-btn:hover {
+            color: var(--primary);
+        }
+        
+        .backup-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .tabs {
+            display: flex;
+            background: var(--light);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        
+        .tab.active {
+            background: var(--primary);
+            color: white;
+            font-weight: 500;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            background: var(--success);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .notification.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .install-prompt {
+            background: var(--warning);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        @media (max-width: 768px) {
+            .transport-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .app-bar {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+            
+            .action-buttons {
+                width: 100%;
+                display: flex;
+                gap: 10px;
+            }
+            
+            .btn {
+                flex: 1;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="app-bar">
+                <h1 class="app-title">🚢 Transporte Isla de Lobos</h1>
+                <div class="action-buttons">
+                    <button class="btn btn-primary" id="newTransportBtn">
+                        <i class="fas fa-plus"></i> Nuevo Transporte
+                    </button>
+                    <button class="btn btn-success" id="backupBtn">
+                        <i class="fas fa-download"></i> Respaldar
+                    </button>
+                    <button class="btn btn-warning" id="restoreBtn">
+                        <i class="fas fa-upload"></i> Restaurar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div id="installPrompt" class="install-prompt" style="display: none;">
+            <p>Instala esta app para tener acceso offline</p>
+            <button class="btn btn-light" id="installBtn">Instalar</button>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" data-tab="transports">Transportes</div>
+            <div class="tab" data-tab="backup">Copias de Seguridad</div>
+        </div>
+
+        <div class="tab-content active" id="transportsTab">
+            <div class="card">
+                <h2 class="card-title">Lista de Transportes</h2>
+                <div id="transportList" class="transport-grid">
+                    <!-- Los transportes se cargarán aquí dinámicamente -->
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="backupTab">
+            <div class="card">
+                <h2 class="card-title">Gestión de Copias de Seguridad</h2>
+                <div class="backup-section">
+                    <p>Realiza copias de seguridad de todos tus datos de transporte para evitar pérdidas de información.</p>
+                    <button class="btn btn-success" id="exportBtn">
+                        <i class="fas fa-file-export"></i> Exportar Datos
+                    </button>
+                    <button class="btn btn-warning" id="importBtn">
+                        <i class="fas fa-file-import"></i> Importar Datos
+                    </button>
+                    <input type="file" id="importFile" accept=".json" style="display: none;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para nuevo/editar transporte -->
+    <div id="transportModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
+        <div class="card" style="width: 90%; max-width: 500px;">
+            <h2 class="card-title" id="modalTitle">Nuevo Transporte</h2>
+            <form id="transportForm">
+                <input type="hidden" id="transportId">
+                <div class="form-group">
+                    <label class="form-label" for="transportName">Nombre del Transporte</label>
+                    <input type="text" class="form-input" id="transportName" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="transportType">Tipo de Transporte</label>
+                    <select class="form-input" id="transportType" required>
+                        <option value="">Seleccionar tipo</option>
+                        <option value="lancha">Lancha</option>
+                        <option value="ferry">Ferry</option>
+                        <option value="bote">Bote</option>
+                        <option value="helicoptero">Helicóptero</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="capacity">Capacidad (personas)</label>
+                    <input type="number" class="form-input" id="capacity" min="1" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="schedule">Horario</label>
+                    <input type="text" class="form-input" id="schedule" placeholder="Ej: Lunes a Viernes 8:00-18:00">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="contact">Contacto</label>
+                    <input type="text" class="form-input" id="contact" placeholder="Teléfono o email">
+                </div>
+                <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                    <button type="button" class="btn btn-danger" id="cancelModalBtn">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notificación -->
+    <div id="notification" class="notification">
+        <i class="fas fa-check-circle"></i>
+        <span id="notificationText">Operación realizada con éxito</span>
+    </div>
+
+    <script>
+        // Variables globales
+        let transports = JSON.parse(localStorage.getItem('transports')) || [];
+        let deferredPrompt;
+
+        // Elementos DOM
+        const transportList = document.getElementById('transportList');
+        const transportModal = document.getElementById('transportModal');
+        const transportForm = document.getElementById('transportForm');
+        const modalTitle = document.getElementById('modalTitle');
+        const cancelModalBtn = document.getElementById('cancelModalBtn');
+        const newTransportBtn = document.getElementById('newTransportBtn');
+        const exportBtn = document.getElementById('exportBtn');
+        const importBtn = document.getElementById('importBtn');
+        const importFile = document.getElementById('importFile');
+        const backupBtn = document.getElementById('backupBtn');
+        const restoreBtn = document.getElementById('restoreBtn');
+        const notification = document.getElementById('notification');
+        const notificationText = document.getElementById('notificationText');
+        const installPrompt = document.getElementById('installPrompt');
+        const installBtn = document.getElementById('installBtn');
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', () => {
+            renderTransports();
+            setupEventListeners();
+            checkPWAInstallable();
+        });
+
+        // Configurar event listeners
+        function setupEventListeners() {
+            // Formulario de transporte
+            transportForm.addEventListener('submit', handleTransportSubmit);
+            cancelModalBtn.addEventListener('click', closeModal);
+            newTransportBtn.addEventListener('click', () => openModal());
+            
+            // Copias de seguridad
+            exportBtn.addEventListener('click', exportData);
+            importBtn.addEventListener('click', () => importFile.click());
+            importFile.addEventListener('change', importData);
+            backupBtn.addEventListener('click', exportData);
+            restoreBtn.addEventListener('click', () => importFile.click());
+            
+            // PWA installation
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                installPrompt.style.display = 'flex';
+            });
+            
+            installBtn.addEventListener('click', async () => {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    if (outcome === 'accepted') {
+                        installPrompt.style.display = 'none';
+                    }
+                    deferredPrompt = null;
+                }
+            });
+            
+            // Tabs
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabId = tab.getAttribute('data-tab');
+                    activateTab(tabId);
+                });
+            });
+        }
+
+        // Funciones de la interfaz
+        function renderTransports() {
+            transportList.innerHTML = '';
+            
+            if (transports.length === 0) {
+                transportList.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #777;">
+                        <i class="fas fa-ship" style="font-size: 3rem; margin-bottom: 15px;"></i>
+                        <p>No hay transportes registrados. Agrega el primero haciendo clic en "Nuevo Transporte".</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            transports.forEach(transport => {
+                const transportCard = document.createElement('div');
+                transportCard.className = 'transport-card';
+                transportCard.innerHTML = `
+                    <div class="transport-name">${transport.name}</div>
+                    <div class="transport-detail">
+                        <span>Tipo:</span>
+                        <span>${getTransportTypeLabel(transport.type)}</span>
+                    </div>
+                    <div class="transport-detail">
+                        <span>Capacidad:</span>
+                        <span>${transport.capacity} personas</span>
+                    </div>
+                    <div class="transport-detail">
+                        <span>Horario:</span>
+                        <span>${transport.schedule || 'No especificado'}</span>
+                    </div>
+                    <div class="transport-detail">
+                        <span>Contacto:</span>
+                        <span>${transport.contact || 'No especificado'}</span>
+                    </div>
+                    <div class="transport-actions">
+                        <button class="action-btn edit-btn" data-id="${transport.id}">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn delete-btn" data-id="${transport.id}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                
+                transportList.appendChild(transportCard);
+            });
+            
+            // Agregar event listeners a los botones de editar y eliminar
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = e.currentTarget.getAttribute('data-id');
+                    const transport = transports.find(t => t.id === id);
+                    if (transport) openModal(transport);
+                });
+            });
+            
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = e.currentTarget.getAttribute('data-id');
+                    deleteTransport(id);
+                });
+            });
+        }
+        
+        function getTransportTypeLabel(type) {
+            const types = {
+                'lancha': 'Lancha',
+                'ferry': 'Ferry',
+                'bote': 'Bote',
+                'helicoptero': 'Helicóptero'
+            };
+            return types[type] || type;
+        }
+        
+        function openModal(transport = null) {
+            if (transport) {
+                // Modo edición
+                modalTitle.textContent = 'Editar Transporte';
+                document.getElementById('transportId').value = transport.id;
+                document.getElementById('transportName').value = transport.name;
+                document.getElementById('transportType').value = transport.type;
+                document.getElementById('capacity').value = transport.capacity;
+                document.getElementById('schedule').value = transport.schedule || '';
+                document.getElementById('contact').value = transport.contact || '';
+            } else {
+                // Modo nuevo
+                modalTitle.textContent = 'Nuevo Transporte';
+                transportForm.reset();
+                document.getElementById('transportId').value = '';
+            }
+            
+            transportModal.style.display = 'flex';
+        }
+        
+        function closeModal() {
+            transportModal.style.display = 'none';
+        }
+        
+        function handleTransportSubmit(e) {
+            e.preventDefault();
+            
+            const transportId = document.getElementById('transportId').value;
+            const transportData = {
+                name: document.getElementById('transportName').value,
+                type: document.getElementById('transportType').value,
+                capacity: parseInt(document.getElementById('capacity').value),
+                schedule: document.getElementById('schedule').value,
+                contact: document.getElementById('contact').value
+            };
+            
+            if (transportId) {
+                // Editar transporte existente
+                transportData.id = transportId;
+                updateTransport(transportData);
+            } else {
+                // Crear nuevo transporte
+                transportData.id = Date.now().toString();
+                addTransport(transportData);
+            }
+            
+            closeModal();
+        }
+        
+        function addTransport(transport) {
+            transports.push(transport);
+            saveTransports();
+            showNotification('Transporte agregado con éxito');
+            renderTransports();
+        }
+        
+        function updateTransport(transportData) {
+            const index = transports.findIndex(t => t.id === transportData.id);
+            if (index !== -1) {
+                transports[index] = transportData;
+                saveTransports();
+                showNotification('Transporte actualizado con éxito');
+                renderTransports();
+            }
+        }
+        
+        function deleteTransport(id) {
+            if (confirm('¿Estás seguro de que deseas eliminar este transporte?')) {
+                transports = transports.filter(t => t.id !== id);
+                saveTransports();
+                showNotification('Transporte eliminado con éxito');
+                renderTransports();
+            }
+        }
+        
+        function saveTransports() {
+            localStorage.setItem('transports', JSON.stringify(transports));
+        }
+        
+        // Funciones de copia de seguridad
+        function exportData() {
+            const dataStr = JSON.stringify(transports, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = `transporte-isla-lobos-${new Date().toISOString().split('T')[0]}.json`;
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+            
+            showNotification('Datos exportados con éxito');
+        }
+        
+        function importData(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    if (Array.isArray(importedData)) {
+                        if (confirm('¿Estás seguro de que deseas importar estos datos? Se sobrescribirán los datos actuales.')) {
+                            transports = importedData;
+                            saveTransports();
+                            renderTransports();
+                            showNotification('Datos importados con éxito');
+                        }
+                    } else {
+                        throw new Error('Formato de archivo inválido');
+                    }
+                } catch (error) {
+                    alert('Error al importar el archivo: ' + error.message);
+                }
+            };
+            reader.readAsText(file);
+            
+            // Reset input file
+            e.target.value = '';
+        }
+        
+        // Funciones de UI
+        function showNotification(message) {
+            notificationText.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        function activateTab(tabId) {
+            // Activar tab
+            tabs.forEach(tab => {
+                if (tab.getAttribute('data-tab') === tabId) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+            
+            // Mostrar contenido del tab
+            tabContents.forEach(content => {
+                if (content.id === `${tabId}Tab`) {
+                    content.classList.add('active');
+                } else {
+                    content.classList.remove('active');
+                }
+            });
+        }
+        
+        function checkPWAInstallable() {
+            if (window.matchMedia('(display-mode: standalone)').matches) {
+                installPrompt.style.display = 'none';
+            }
+        }
+
+        // Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').then(registration => {
+                    console.log('SW registered: ', registration);
+                }).catch(registrationError => {
+                    console.log('SW registration failed: ', registrationError);
+                });
+            });
+        }
+    </script>
+
+    <!-- Service Worker (sw.js would be a separate file, but including inline for simplicity) -->
+    <script>
+        // Este código normalmente estaría en un archivo sw.js separado
+        const CACHE_NAME = 'transporte-isla-lobos-v1';
+        const urlsToCache = [
+            '/',
+            '/styles/main.css',
+            '/script/main.js'
+        ];
+
+        self.addEventListener('install', event => {
+            event.waitUntil(
+                caches.open(CACHE_NAME)
+                    .then(cache => {
+                        return cache.addAll(urlsToCache);
+                    })
+            );
+        });
+
+        self.addEventListener('fetch', event => {
+            event.respondWith(
+                caches.match(event.request)
+                    .then(response => {
+                        if (response) {
+                            return response;
+                        }
+                        return fetch(event.request);
+                    }
+                )
+            );
+        });
+    </script>
+</body>
+</html>
