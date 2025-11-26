@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Control de Transporte - Corralejo-Lobos</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <meta name="theme-color" content="#0077be"/>
+  <link rel="apple-touch-icon" href="./icons/icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Transporte Lobos">
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+<header><h1>Control de Transporte Marítimo</h1><p>Corralejo ↔️ Isla de Lobos</p></header>
+<div class="container">
+  <h2>App lista como PWA</h2>
+  <p>Este es el esqueleto base. Aquí iría todo tu contenido (registro, historial, estadísticas y configuración).</p>
+</div>
+<footer><p>Sistema de Control de Transporte Marítimo © 2025</p></footer>
+<script src="./app.js" defer></script>
+<script> if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigator.serviceWorker.register('./sw.js'); }); } </script>
+</body>
+</html>
