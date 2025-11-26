@@ -1,0 +1,1 @@
+document.getElementById('app').innerText = 'App lista para GitHub Pages.';
